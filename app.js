@@ -5,7 +5,7 @@ const Listing=require("./models/listing.js")
 const path = require("path");
 const methodOvveride = require("method-override"); 
 const ejsMate=require("ejs-mate");
-const wrapAsync = require("./utilis/wrapAsync.js");
+const wrapAsync = require("./utils/wrapAsync.js");
 
 let MONGO_URL="mongodb://127.0.0.1:27017/wonderlust";
 main().then(()=>{
@@ -48,13 +48,16 @@ app.get("/listings", async(req,res)=>{
         res.render("listings/show.ejs",{listing})
     })
         //create route
-        app.post("/listings",wrapAsync(async(req,res,next)=>{
+        app.post("/listings", 
+        wrapAsync(async(req,res,next)=>{
         
           
                 const newListing=  new Listing(req.body.listing);
                 await newListing.save();
                 res.redirect("/listings");
+               
           }));
+
 
 
 //update route
@@ -93,6 +96,7 @@ app.delete("/listings/:id",async(req,res)=>{
 
 app.use((err,req,res,next)=>{
     res.send("Something went wrong");
+    next(err);
 })
 app.listen(8080,()=>{
     console.log("server is listening on port :8080")

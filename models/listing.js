@@ -13,7 +13,7 @@ const listingSchema= new Schema({
         set:(v)=>v===""?"https://unsplash.com/photos/photography-of-brown-high-rise-building-beside-seashore-during-daytime-b8kEUZqMNoQ":v,
 
     },
-    price: Number,
+    price:Number,
     location: String,
     country: String
 });

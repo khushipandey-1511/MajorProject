@@ -13,12 +13,11 @@
         <br><br/>
      
     <h3> Create new listing</h3>
-    <form method="POST" action="/listings" novalidate class="needs-validation">
+    <form method="POST" action="/listings" novalidate
+    class="needs-validation" 
+     >
       
-
-
-        
-        <div class="mb-3">
+ <div class="mb-3">
             <label for="title"  class="form-label"> Title</label>
             <input name="listing[title]" placeholder=" Add a catchy title"
              type="text" class="form-control"
@@ -43,7 +42,7 @@
         <div class="row">
             <div class="mb-3 col-md-4">
                 <label for="price"  class="form-label"> Price</v>
-                <input name="listing[price]"class="form-control" placeholder=" 1200" type="number" required/>
+                <input name="listing[price]"class="form-control" placeholder=" 1200" type="number" />
                 <div class="invalid-feedback"> Price  should be valid </div>
             </div>
             <div class="mb-3 col-md-8 " >
