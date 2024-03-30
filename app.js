@@ -7,6 +7,7 @@ const methodOvveride = require("method-override");
 const ejsMate=require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require ("./utils/ExpressError.js");
+const {listingSchema} = require("./schema.js");
 
 let MONGO_URL="mongodb://127.0.0.1:27017/wonderlust";
 main().then(()=>{
@@ -15,7 +16,12 @@ console.log("connected to DB")
     console.log(err);
 })
 async function main(){
-    await mongoose.connect(MONGO_URL);
+await mongoose.connect(MONGO_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        maxMessageSize: 100000000 // Adjust as needed
+    }); 
+    
 
 }
 app.set("view engine","ejs");
@@ -28,6 +34,15 @@ app.use(express.static(path.join(__dirname,"/public")));
 app.get("/",(req,res)=>{
     res.send("hi i am root")
 })
+const validateListing =(req,res,next)=>{
+    let {error}=listingSchema.validate(req.body);
+     if(error){
+        let errMsg=error.details.map((el)=> el.message).join(",");
+        throw new ExpressError(400,errMsg)
+    }else{
+        next();
+    }
+}
 
 //index route
 app.get("/listings",  wrapAsync(async(req,res)=>{
@@ -49,14 +64,10 @@ app.get("/listings",  wrapAsync(async(req,res)=>{
         res.render("listings/show.ejs",{listing})
     }));
         //create route
-        app.post("/listings", 
+        app.post("/listings", validateListing,
         wrapAsync(async(req,res,next)=>{
-            if(!req.body.listing){
-                throw new ExpressError(400,"send valid data for listing ")
-            }
-        
-          
-                const newListing=  new Listing(req.body.listing);
+           
+           const newListing=  new Listing(req.body.listing);
                 await newListing.save();
                 res.redirect("/listings");
                
@@ -71,15 +82,15 @@ app.get("/listings/:id/edit", wrapAsync(async(req,res)=>{
     res.render("listings/edit.ejs",{listing})
 }));
 //update 
-app.put("/listings/:id", wrapAsync(async(req,res)=>{
-    if(!req.body.listing){
-        throw new ExpressError(400,"send valid data for listing")
+app.put("/listings/:id", 
+validateListing, wrapAsync(async(req,res)=>{
+
     
     let {id}= req.params;
   await  Listing.findByIdAndUpdate(id,{...req.body.listing});
   res.redirect("/listings");
 
-}}));
+}));
 //delete route
 app.delete("/listings/:id", wrapAsync(async(req,res)=>{
     let {id}=req.params;
