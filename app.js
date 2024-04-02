@@ -8,22 +8,20 @@ const ejsMate=require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require ("./utils/ExpressError.js");
 const {listingSchema} = require("./schema.js");
+const Review=require("./models/review.js")
 
 let MONGO_URL="mongodb://127.0.0.1:27017/wonderlust";
 main().then(()=>{
-console.log("connected to DB")
-}).catch((err)=>{
+    console.log("DB is Connected");
+})
+.catch((err)=>{
     console.log(err);
 })
-async function main(){
-await mongoose.connect(MONGO_URL, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        maxMessageSize: 100000000 // Adjust as needed
-    }); 
-    
 
+async function main(){
+    await mongoose.connect("mongodb://127.0.0.1:27017/wonderlust");
 }
+
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended:true}))
@@ -98,6 +96,22 @@ app.delete("/listings/:id", wrapAsync(async(req,res)=>{
     console.log(deleteListing);
     res.redirect("/listings")
 }))
+
+//reviews
+//post route
+app.post("/listings/:id/reviews",async(req,res)=>{
+    let listing= await Listing.findById(req.params.id);
+    let newReview= new Review (req.body.review);
+
+    listing.reviews.push(newReview);
+
+    await newReview.save();
+    await listing.save();
+
+console.log("new review saved");
+res.send(" new review");
+})
+
 // app.get("/testListing",async (req,res)=>{
 // let sampleListing = new Listing({
 //     title:"My new Villa",
