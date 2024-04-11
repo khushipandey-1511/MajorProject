@@ -112,6 +112,6 @@ border: none !important ;
 }
 /* map*/
 #map{
-    height:100px;
-    width: 100px;
+    height:400px;
+    width: 80vh;
 }
